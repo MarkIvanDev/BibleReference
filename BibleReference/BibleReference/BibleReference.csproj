@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>BibleReference</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>BibleReference</Title>
+    <Authors>markivan.basto</Authors>
+    <Description>Bible Reference parser</Description>
+    <Copyright>(c) 2020 Mark Ivan Basto</Copyright>
+    <PackageProjectUrl>https://github.com/MarkIvanDev/BibleReference</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/MarkIvanDev/BibleReference.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>bible reference book chapter verse parser</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BibleBooks" Version="1.3.1" />
+  </ItemGroup>
+
+</Project>
