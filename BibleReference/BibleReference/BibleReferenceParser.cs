@@ -33,7 +33,7 @@ namespace BibleReference
         #region Reference
         public static Reference Parse(string text, CultureInfo culture = null)
         {
-            var reference = InternalParse(text, out var errorMessage, culture);
+            var reference = InternalParse(text ?? string.Empty, out var errorMessage, culture);
             if (errorMessage != null)
             {
                 throw new Exception(errorMessage);
@@ -43,7 +43,7 @@ namespace BibleReference
 
         public static bool TryParse(string text, out Reference reference, CultureInfo culture = null)
         {
-            reference = InternalParse(text, out string errorMessage, culture);
+            reference = InternalParse(text ?? string.Empty, out string errorMessage, culture);
             return errorMessage == null;
         }
 

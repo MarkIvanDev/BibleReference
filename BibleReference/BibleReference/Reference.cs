@@ -31,7 +31,7 @@ namespace BibleReference
 {
     public class Reference
     {
-        public Reference(Key? bookKey, string bookName, params ReferenceSegment[] segments) : this(bookKey, bookName, segments?.ToList())
+        public Reference(Key? bookKey, string bookName, params ReferenceSegment[] segments) : this(bookKey, bookName, segments?.ToList() ?? new List<ReferenceSegment>())
         {
         }
 
