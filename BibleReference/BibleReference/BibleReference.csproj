@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>BibleReference</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
     <Description>Bible Reference parser</Description>
