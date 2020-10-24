@@ -318,7 +318,6 @@ namespace BibleReference
                             return default;
                         }
 
-                        chapterOverride = i;
                         return new ReferencePoint(i);
                     }
                 }
