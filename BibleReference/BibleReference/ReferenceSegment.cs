@@ -69,13 +69,11 @@ namespace BibleReference
 
         public ReferencePoint End { get; }
 
-        public bool IsRange { get { return Start != End; } }
-
         public override string ToString()
         {
             var sb = new StringBuilder();
             sb.Append(Start.ToString());
-            if(IsRange)
+            if(Start != End)
             {
                 if(Start.Chapter == End.Chapter)
                 {
