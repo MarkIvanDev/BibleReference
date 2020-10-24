@@ -94,7 +94,8 @@ namespace BibleReference
                 BibleBooksHelper.GetKeyForOsisCode(text) ??
                 BibleBooksHelper.GetKeyForParatextCode(text) ??
                 BibleBooksHelper.GetKeyForStandardAbbreviation(text, culture) ??
-                BibleBooksHelper.GetKeyForThompsonAbbreviation(text, culture);
+                BibleBooksHelper.GetKeyForThompsonAbbreviation(text, culture) ??
+                (!text.Equals(string.Empty) ? BibleBooksHelper.GetKeyForAlternativeName(text, culture) : null);
 
             if (key == null)
             {
