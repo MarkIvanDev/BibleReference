@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>BibleReference</PackageId>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.2.0-prerelease202210251901</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
     <Description>Bible Reference parser</Description>
@@ -18,10 +18,11 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>bible reference book chapter verse parser</PackageTags>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks" Version="1.4.0" />
+    <PackageReference Include="BibleBooks" Version="1.5.0-prerelease202210151853" />
   </ItemGroup>
 
 </Project>

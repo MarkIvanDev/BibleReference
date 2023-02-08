@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using BibleBooks;
@@ -58,6 +59,18 @@ namespace BibleReference
             var sb = new StringBuilder();
             sb.Append(BookName);
             if(Segments.Count != 0)
+            {
+                sb.Append(" ");
+                sb.Append(string.Join(";", Segments));
+            }
+            return sb.ToString();
+        }
+
+        public string ToString(CultureInfo culture)
+        {
+            var sb = new StringBuilder();
+            sb.Append(BookKey.HasValue ? BibleBooksHelper.GetName(BookKey.Value, culture) : BookName);
+            if (Segments.Count != 0)
             {
                 sb.Append(" ");
                 sb.Append(string.Join(";", Segments));
