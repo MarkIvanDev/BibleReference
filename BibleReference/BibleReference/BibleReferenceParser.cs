@@ -33,9 +33,9 @@ namespace BibleReference
         public static Reference Parse(string? text, CultureInfo? culture = null)
         {
             var referenceResult = InternalParse(text ?? string.Empty, culture);
-            if (referenceResult.IsSuccessful && referenceResult.Reference != null)
+            if (referenceResult.IsSuccessful && referenceResult.Reference.HasValue)
             {
-                return referenceResult.Reference;
+                return referenceResult.Reference.Value;
             }
             else
             {

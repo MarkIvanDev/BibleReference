@@ -79,9 +79,9 @@ namespace BibleReference
         }
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return obj is ReferenceSegment && Equals((ReferenceSegment)obj);
+            return obj is ReferenceSegment segment && Equals(segment);
         }
 
         public bool Equals(ReferenceSegment other)

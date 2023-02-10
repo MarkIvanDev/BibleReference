@@ -82,9 +82,9 @@ namespace BibleReference
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return obj is ReferencePoint && Equals((ReferencePoint)obj);
+            return obj is ReferencePoint point && Equals(point);
         }
 
         public bool Equals(ReferencePoint other)

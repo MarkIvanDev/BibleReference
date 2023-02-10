@@ -30,7 +30,7 @@ using BibleBooks;
 
 namespace BibleReference
 {
-    public class Reference
+    public readonly struct Reference : IEquatable<Reference>
     {
         public Reference(BibleBook book, params ReferenceSegment[]? segments) : this(book, segments?.ToList())
         {
@@ -50,6 +50,28 @@ namespace BibleReference
         public BibleBook Book { get; }
 
         public ReadOnlyCollection<ReferenceSegment> Segments { get; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Reference reference && Equals(reference);
+        }
+
+        public bool Equals(Reference other)
+        {
+            return Book == other.Book &&
+                Segments.SequenceEqual(other.Segments);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -966783545;
+            hashCode = hashCode * -1521134295 + Book.GetHashCode();
+            foreach (var segment in Segments)
+            {
+                hashCode = hashCode * -1521134295 + segment.GetHashCode();
+            }
+            return hashCode;
+        }
 
         public override string ToString()
         {
@@ -94,6 +116,16 @@ namespace BibleReference
                 }
             }
             return builder.ToString();
+        }
+
+        public static bool operator ==(Reference left, Reference right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Reference left, Reference right)
+        {
+            return !(left == right);
         }
     }
 }

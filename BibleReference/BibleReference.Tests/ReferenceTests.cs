@@ -75,5 +75,29 @@ namespace BibleReference.Tests
             }
         }
 
+        [Fact(DisplayName = "== operator")]
+        public void EqualsOperator()
+        {
+            Assert.Equal(
+                new Reference(
+                    BibleBook.Genesis,
+                    ReferenceSegment.MultipleVerses(1, 1, 5),
+                    ReferenceSegment.MultipleVerses(2, 1, 3)
+                ),
+                BibleReferenceParser.Parse("Genesis 1:1-5;2:1-3"));
+        }
+
+        [Fact(DisplayName = "!= operator")]
+        public void NotEqualsOperator()
+        {
+            Assert.NotEqual(
+                new Reference(
+                    BibleBook.Genesis,
+                    ReferenceSegment.MultipleVerses(1, 1, 5),
+                    ReferenceSegment.MultipleVerses(2, 1, 3)
+                ),
+                BibleReferenceParser.Parse("Genesis 1:1,5;2:1,3"));
+        }
+
     }
 }
