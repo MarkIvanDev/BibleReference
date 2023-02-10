@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -10,7 +11,7 @@
     <PackageVersion>1.2.0-prerelease202210251901</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
-    <Description>Bible Reference parser</Description>
+    <Description>A library to parse text into bible references in multiple locales.</Description>
     <Copyright>(c) 2020 Mark Ivan Basto</Copyright>
     <PackageProjectUrl>https://github.com/MarkIvanDev/BibleReference</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MarkIvanDev/BibleReference.git</RepositoryUrl>
@@ -22,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks" Version="1.5.0-prerelease202210151853" />
+    <PackageReference Include="BibleBooks" Version="2.0.0-dev.4" />
   </ItemGroup>
 
 </Project>
