@@ -28,7 +28,7 @@ You can use the `BibleReferenceParser` static class to parse.
 
 ```csharp
 var reference = BibleReferenceParser.Parse("Genesis 1:1-5;2:1-3");
-print(reference ==
+Console.WriteLine(reference ==
     new Reference(
       BibleBook.Genesis,
       ReferenceSegment.MultipleVerses(1, 1, 5),
