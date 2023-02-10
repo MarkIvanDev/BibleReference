@@ -2,15 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
     <PackageId>BibleReference</PackageId>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>2.0.0-dev.1</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
-    <Description>Bible Reference parser</Description>
+    <Description>A library to parse text into bible references in multiple locales.</Description>
     <Copyright>(c) 2020 Mark Ivan Basto</Copyright>
     <PackageProjectUrl>https://github.com/MarkIvanDev/BibleReference</PackageProjectUrl>
     <RepositoryUrl>https://github.com/MarkIvanDev/BibleReference.git</RepositoryUrl>
@@ -18,10 +19,16 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>bible reference book chapter verse parser</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks" Version="1.4.0" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BibleBooks" Version="2.0.0-dev.4" />
   </ItemGroup>
 
 </Project>

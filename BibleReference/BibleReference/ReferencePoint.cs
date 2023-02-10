@@ -28,10 +28,6 @@ namespace BibleReference
 {
     public readonly struct ReferencePoint : IEquatable<ReferencePoint>, IComparable<ReferencePoint>
     {
-        public ReferencePoint(int chapter) : this(chapter, 0)
-        {
-        }
-
         public ReferencePoint(int chapter, int verse)
         {
             if(chapter <= 0)
@@ -39,8 +35,18 @@ namespace BibleReference
                 throw new ArgumentException("Chapter number cannot be less than or equal to 0", nameof(chapter));
             }
 
+            if (verse < 0)
+            {
+                throw new ArgumentException("Verse number cannot be less than 0", nameof(verse));
+            }
+
             Chapter = chapter;
             Verse = verse;
+        }
+
+        public static ReferencePoint WholeChapter(int chapter)
+        {
+            return new ReferencePoint(chapter, 0);
         }
 
         public int Chapter { get; }
@@ -76,9 +82,9 @@ namespace BibleReference
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return obj is ReferencePoint && Equals((ReferencePoint)obj);
+            return obj is ReferencePoint point && Equals(point);
         }
 
         public bool Equals(ReferencePoint other)
