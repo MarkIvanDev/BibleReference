@@ -28,42 +28,33 @@ namespace BibleReference
 {
     public readonly struct ReferenceSegment : IEquatable<ReferenceSegment>
     {
-        public ReferenceSegment(int chapter) : this(new ReferencePoint(chapter))
-        {
-        }
-
-        public ReferenceSegment(int chapterStart, int chapterEnd) : this(new ReferencePoint(chapterStart), new ReferencePoint(chapterEnd))
-        {
-        }
-
-        public ReferenceSegment(ReferencePoint point) : this(point, point)
-        {
-        }
-
-        public ReferenceSegment(ReferencePoint point, int verseEnd) : this(point, new ReferencePoint(point.Chapter, verseEnd))
-        {
-        }
-
         public ReferenceSegment(ReferencePoint start, ReferencePoint end)
         {
             if (start > end)
             {
-                throw new ArgumentException("Start chapter is greater than the end chapter");
-            }
-
-            if (start.Chapter == end.Chapter && start.Verse > end.Verse)
-            {
-                throw new ArgumentException("Start verse is greater than the end verse");
+                throw new ArgumentException("Start point is greater than the end point");
             }
 
             if (start.Verse == 0 ^ end.Verse == 0)
             {
-                throw new ArgumentException("One of the start and end verses is 0 and the other is not");
+                throw new ArgumentException("Start and end verses are only valid when both are 0 or both are greater than 0");
             }
 
             Start = start;
             End = end;
         }
+
+        public static ReferenceSegment SingleChapter(int chapter)
+            => new ReferenceSegment(ReferencePoint.WholeChapter(chapter), ReferencePoint.WholeChapter(chapter));
+
+        public static ReferenceSegment MultipleChapters(int start, int end)
+            => new ReferenceSegment(ReferencePoint.WholeChapter(start), ReferencePoint.WholeChapter(end));
+
+        public static ReferenceSegment SingleVerse(int chapter, int verse)
+            => new ReferenceSegment(new ReferencePoint(chapter, verse), new ReferencePoint(chapter, verse));
+
+        public static ReferenceSegment MultipleVerses(int chapter, int startVerse, int endVerse)
+            => new ReferenceSegment(new ReferencePoint(chapter, startVerse), new ReferencePoint(chapter, endVerse));
 
         public ReferencePoint Start { get; }
 

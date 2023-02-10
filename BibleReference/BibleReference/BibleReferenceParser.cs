@@ -1,17 +1,17 @@
 ﻿// MIT License
-   
+
 // Copyright(c) 2020 Mark Ivan Basto
-   
+
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-   
+
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-   
+
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,71 +22,80 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using BibleBooks;
 
 namespace BibleReference
 {
     public static class BibleReferenceParser
     {
-        #region Reference
-        public static Reference Parse(string text, CultureInfo culture = null)
+        public static Reference Parse(string? text, CultureInfo? culture = null)
         {
-            var reference = InternalParse(text ?? string.Empty, out var errorMessage, culture);
-            if (errorMessage != null)
+            var referenceResult = InternalParse(text ?? string.Empty, culture);
+            if (referenceResult.IsSuccessful && referenceResult.Reference != null)
             {
-                throw new Exception(errorMessage);
+                return referenceResult.Reference;
             }
-            return reference;
-        }
-
-        public static bool TryParse(string text, out Reference reference, CultureInfo culture = null)
-        {
-            reference = InternalParse(text ?? string.Empty, out string errorMessage, culture);
-            return errorMessage == null;
-        }
-
-        private static Reference InternalParse(string text, out string errorMessage, CultureInfo culture = null)
-        {
-            var splitIndex = 0;
-            for (int i = 0; i < text.Length; i++)
+            else
             {
-                if (i != 0 && char.IsDigit(text[i]))
+                throw new Exception(referenceResult.ErrorMessage);
+            }
+        }
+
+        public static bool TryParse(string? text, out Reference? reference, CultureInfo? culture = null)
+        {
+            var referenceResult = InternalParse(text ?? string.Empty, culture);
+            reference = referenceResult.Reference;
+            return referenceResult.IsSuccessful;
+        }
+
+        private static ReferenceResult InternalParse(string text, CultureInfo? culture = null)
+        {
+            var textTrimmed = text.Trim();
+            if (string.IsNullOrEmpty(textTrimmed)) return ReferenceResult.Error("Text is empty");
+
+            var splitIndex = 0;
+            for (int i = 0; i < textTrimmed.Length; i++)
+            {
+                if (i != 0 && char.IsDigit(textTrimmed[i]))
                 {
                     splitIndex = i;
                     break;
                 }
             }
-            var bookPart = text.Substring(0, splitIndex).Trim();
-            var book = InternalParseBook(bookPart, culture);
-
-            var maxChapter = book.Key != null ? BibleBooksHelper.GetMaxChapter(book.Key.Value) : int.MaxValue;
-            var segmentsPart = text.Substring(splitIndex).Trim();
-            var segments = InternalParseSegments(segmentsPart, maxChapter, out errorMessage);
-            if (errorMessage != null)
+            var bookPart = textTrimmed
+                .Substring(0, splitIndex == 0 ? textTrimmed.Length : splitIndex)
+                .Trim();
+            var bookResult = InternalParseBook(bookPart, culture);
+            if (bookResult.IsSuccessful && bookResult.Book.HasValue)
             {
-                return default;
+                if (splitIndex == 0)
+                {
+                    return ReferenceResult.Success(new Reference(bookResult.Book.Value));
+                }
+                else
+                {
+                    var maxChapter = BibleBooksHelper.GetMaxChapter(bookResult.Book.Value) ?? 0;
+                    var segmentsPart = textTrimmed.Substring(splitIndex).Trim();
+                    var segmentsResult = InternalParseSegments(segmentsPart, maxChapter);
+                    if (segmentsResult.IsSuccessful && segmentsResult.Segments != null)
+                    {
+                        return ReferenceResult.Success(new Reference(bookResult.Book.Value, segmentsResult.Segments));
+                    }
+                    else
+                    {
+                        return ReferenceResult.Error(segmentsResult.ErrorMessage ?? string.Empty);
+                    }
+                }
             }
-
-            errorMessage = null;
-            return new Reference(book.Key, book.Value, segments);
-        } 
-        #endregion
-
-        #region Book
-        public static KeyValuePair<Key?, string> ParseBook(string text, CultureInfo culture = null)
-        {
-            return InternalParseBook(text, culture);
+            else
+            {
+                return ReferenceResult.Error(bookResult.ErrorMessage ?? string.Empty);
+            }
         }
 
-        public static bool TryParseBook(string text, out KeyValuePair<Key?, string> book, CultureInfo culture = null)
-        {
-            book = InternalParseBook(text, culture);
-            return book.Key.HasValue;
-        }
-
-        private static KeyValuePair<Key?, string> InternalParseBook(string text, CultureInfo culture = null)
+        private static ReferenceBookResult InternalParseBook(string text, CultureInfo? culture = null)
         {
             var potentialBook = ConvertToArabicNumerals(text, culture);
 
@@ -97,56 +106,62 @@ namespace BibleReference
                 BibleBooksHelper.GetKeyForThompsonAbbreviation(text, culture) ??
                 (!text.Equals(string.Empty) ? BibleBooksHelper.GetKeyForAlternativeName(text, culture) : null);
 
-            if (key == null)
+            if (key.HasValue)
             {
-                return new KeyValuePair<Key?, string>(null, potentialBook);
+                return ReferenceBookResult.Success(key.Value);
             }
             else
             {
-                return new KeyValuePair<Key?, string>(key, BibleBooksHelper.GetName(key.Value, culture));
+                return ReferenceBookResult.Error("Unknown book name");
             }
         }
 
-        private static string ConvertToArabicNumerals(string str, CultureInfo culture = null)
+        private static string ConvertToArabicNumerals(string str, CultureInfo? culture = null)
         {
             // Break up on all remaining white space
-            var parts = (str ?? "").Trim().Split(' ', '\r', '\n', '\t');
+            var parts = str
+                .Trim()
+                .Split(' ', '\r', '\n', '\t')
+                .Select(p => p.Trim())
+                .Where(p => !string.IsNullOrEmpty(p))
+                .ToList();
+            if (parts.Count == 0) return string.Empty;
 
             // If the first part is a roman numeral, or spelled ordinal, convert it to arabic
             var number = parts[0];
             switch (number)
             {
                 case var n when
-                    n.Equals(BibleBooksHelper.GetNumber(Number.First, culture), StringComparison.CurrentCultureIgnoreCase) ||
-                    n.Equals("I", StringComparison.CurrentCultureIgnoreCase):
+                    IsEqual(n, BibleBooksHelper.GetNumber(Number.First, culture), culture) ||
+                    IsEqual(n, "I", culture):
 
                     parts[0] = "1";
                     break;
 
                 case var n when
-                    n.Equals(BibleBooksHelper.GetNumber(Number.Second, culture), StringComparison.CurrentCultureIgnoreCase) ||
-                    n.Equals("II", StringComparison.CurrentCultureIgnoreCase):
+                    IsEqual(n, BibleBooksHelper.GetNumber(Number.Second, culture), culture) ||
+                    IsEqual(n, "II", culture):
 
                     parts[0] = "2";
                     break;
 
                 case var n when
-                    n.Equals(BibleBooksHelper.GetNumber(Number.Third, culture), StringComparison.CurrentCultureIgnoreCase) ||
-                    n.Equals("III", StringComparison.CurrentCultureIgnoreCase):
+                    IsEqual(n, BibleBooksHelper.GetNumber(Number.Third, culture), culture) ||
+                    IsEqual(n, "III", culture):
 
                     parts[0] = "3";
                     break;
 
                 case var n when
-                    n.Equals(BibleBooksHelper.GetNumber(Number.Fourth, culture), StringComparison.CurrentCultureIgnoreCase) ||
-                    n.Equals("IV", StringComparison.CurrentCultureIgnoreCase):
+                    IsEqual(n, BibleBooksHelper.GetNumber(Number.Fourth, culture), culture) ||
+                    IsEqual(n, "IV", culture):
 
                     parts[0] = "4";
                     break;
 
                 case var n when
-                    n.Equals(BibleBooksHelper.GetNumber(Number.Fifth, culture), StringComparison.CurrentCultureIgnoreCase) ||
-                    n.Equals("V", StringComparison.CurrentCultureIgnoreCase):
+                    IsEqual(n, BibleBooksHelper.GetNumber(Number.Fifth, culture), culture) ||
+                    IsEqual(n, "V", culture):
 
                     parts[0] = "5";
                     break;
@@ -154,181 +169,271 @@ namespace BibleReference
 
             return string.Join(" ", parts);
         }
-        #endregion
 
-        #region Segments
-        public static IList<ReferenceSegment> ParseSegments(string text, int maxChapter)
-        {
-            var segments = InternalParseSegments(text, maxChapter, out var errorMessage);
-            if (errorMessage != null)
-            {
-                throw new Exception(errorMessage);
-            }
-            return segments;
-        }
-
-        public static bool TryParseSegments(string text, int maxChapter, out IList<ReferenceSegment> segments)
-        {
-            segments = InternalParseSegments(text, maxChapter, out var errorMessage);
-            return errorMessage == null;
-        }
-
-        private static IList<ReferenceSegment> InternalParseSegments(string text, int maxChapter, out string errorMessage)
+        private static ReferenceSegmentResult InternalParseSegments(string text, int maxChapter)
         {
             try
             {
-                errorMessage = null;
-                var referenceSegments = new Collection<ReferenceSegment>();
+                var referenceSegments = new List<ReferenceSegment>();
 
-                var citations = text.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return ReferenceSegmentResult.Success(referenceSegments);
+                }
+
+                if (maxChapter == 1 && !text.Contains(":"))
+                {
+                    if (int.TryParse(text, out var i) && i == 1)
+                    {
+                        referenceSegments.Add(ReferenceSegment.SingleChapter(1));
+                        return ReferenceSegmentResult.Success(referenceSegments);
+                    }
+                    else
+                    {
+                        return InternalParseSegments($"1:{text}", maxChapter);
+                    }
+                }
+
+                var citations = text
+                    .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(c => c.Trim())
+                    .Where(c => !string.IsNullOrEmpty(c));
                 foreach (var citation in citations)
                 {
-                    // Skip if citation is empty or the given text ends with ;
-                    if (string.IsNullOrWhiteSpace(citation)) continue;
-
-                    var segments = citation.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     int? chapterNumber = null;
+                    var segments = citation
+                        .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim())
+                        .Where(s => !string.IsNullOrEmpty(s));
                     foreach (var segment in segments)
                     {
-                        // Skip if citation is empty or the given text ends with ;
-                        if (string.IsNullOrWhiteSpace(segment)) continue;
-
-                        var ranges = segment.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                        switch (ranges.Length)
+                        var ranges = segment
+                            .Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(r => r.Trim())
+                            .Where(r => !string.IsNullOrEmpty(r))
+                            .ToList();
+                        switch (ranges.Count)
                         {
                             case 1:
-                                var point = InternalParsePoint(ranges[0], maxChapter, ref chapterNumber, out errorMessage);
-                                if (errorMessage != null)
+                                var pointResult = InternalParsePoint(ranges[0], maxChapter, chapterNumber);
+                                if (pointResult.IsSuccessful && pointResult.Point.HasValue)
                                 {
-                                    return referenceSegments;
+                                    chapterNumber = pointResult.ChapterOverride;
+                                    referenceSegments.Add(ReferenceSegment.SingleVerse(pointResult.Point.Value.Chapter, pointResult.Point.Value.Verse));
                                 }
-                                referenceSegments.Add(new ReferenceSegment(point));
+                                else
+                                {
+                                    return ReferenceSegmentResult.Error(pointResult.ErrorMessage ?? string.Empty);
+                                }
                                 break;
+
                             case 2:
-                                var startPoint = InternalParsePoint(ranges[0], maxChapter, ref chapterNumber, out errorMessage);
-                                if (errorMessage != null)
+                                var startPointResult = InternalParsePoint(ranges[0], maxChapter, chapterNumber);
+                                if (startPointResult.IsSuccessful && startPointResult.Point.HasValue)
                                 {
-                                    return referenceSegments;
+                                    chapterNumber = startPointResult.ChapterOverride;
                                 }
-                                var endPoint = InternalParsePoint(ranges[1], maxChapter, ref chapterNumber, out errorMessage);
-                                if (errorMessage != null)
+                                else
                                 {
-                                    return referenceSegments;
+                                    return ReferenceSegmentResult.Error(startPointResult.ErrorMessage ?? string.Empty);
                                 }
-                                referenceSegments.Add(new ReferenceSegment(startPoint, endPoint));
+                                var endPointResult = InternalParsePoint(ranges[1], maxChapter, chapterNumber);
+                                if (endPointResult.IsSuccessful && endPointResult.Point.HasValue)
+                                {
+                                    chapterNumber = endPointResult.ChapterOverride;
+                                }
+                                else
+                                {
+                                    return ReferenceSegmentResult.Error(endPointResult.ErrorMessage ?? string.Empty);
+                                }
+                                referenceSegments.Add(new ReferenceSegment(startPointResult.Point.Value, endPointResult.Point.Value));
                                 break;
+
                             default:
-                                errorMessage = "Invalid range format";
-                                return referenceSegments;
+                                return ReferenceSegmentResult.Error("Invalid range format");
                         }
                     }
                 }
 
-                return referenceSegments;
+                return ReferenceSegmentResult.Success(referenceSegments);
             }
             catch (Exception ex)
             {
-                errorMessage = ex.Message;
-                return new Collection<ReferenceSegment>();
+                return ReferenceSegmentResult.Error(ex.Message);
             }
         }
-        #endregion
 
-        #region Points
-        public static ReferencePoint ParsePoint(string text, int maxChapter, ref int? chapterOverride)
-        {
-            var point = InternalParsePoint(text, maxChapter, ref chapterOverride, out var errorMessage);
-            if (errorMessage != null)
-            {
-                throw new Exception(errorMessage);
-            }
-            return point;
-        }
-
-        public static bool TryParsePoint(string text, int maxChapter, ref int? chapterOverride, out ReferencePoint point)
-        {
-            point = InternalParsePoint(text, maxChapter, ref chapterOverride, out var errorMessage);
-            return errorMessage == null;
-        }
-
-        private static ReferencePoint InternalParsePoint(string text, int maxChapter, ref int? chapterOverride, out string errorMessage)
+        private static ReferencePointResult InternalParsePoint(string text, int maxChapter, int? chapterOverride)
         {
             try
             {
-                errorMessage = null;
                 var colonIndex = text.IndexOf(':');
                 if (colonIndex != -1)
                 {
                     var parts = text.Split(':');
                     if (!int.TryParse(parts[0], out var chapter))
                     {
-                        errorMessage = "Chapter is not a number";
-                        return default;
+                        return ReferencePointResult.Error("Chapter is not a number");
                     }
 
-                    if(chapter <= 0)
+                    if (chapter <= 0)
                     {
-                        errorMessage = "Chapter cannot be less than or equal to 0";
-                        return default;
+                        return ReferencePointResult.Error("Chapter cannot be less than or equal to 0");
                     }
 
                     if (chapter > maxChapter)
                     {
-                        errorMessage = "Chapter exceeds max chapter";
-                        return default;
+                        return ReferencePointResult.Error("Chapter exceeds max chapter");
                     }
 
                     if (!int.TryParse(parts[1], out var verse))
                     {
-                        errorMessage = "Verse is not a number";
-                        return default;
+                        return ReferencePointResult.Error("Verse is not a number");
                     }
 
-                    chapterOverride = chapter;
-                    return new ReferencePoint(chapter, verse);
+                    return ReferencePointResult.Success(new ReferencePoint(chapter, verse), chapter);
                 }
                 else
                 {
                     if (!int.TryParse(text, out var i))
                     {
-                        errorMessage = "Invalid format";
-                        return default;
+                        return ReferencePointResult.Error("Invalid format");
                     }
 
                     if (maxChapter == 1)
                     {
                         chapterOverride = 1;
-                        return new ReferencePoint(1, i);
+                        if (i == 1)
+                        {
+                            return ReferencePointResult.Success(new ReferencePoint(i, 0), i);
+                        }
+                        else
+                        {
+                            return ReferencePointResult.Success(new ReferencePoint(1, i), 1);
+                        }
                     }
                     else if (chapterOverride.HasValue)
                     {
-                        return new ReferencePoint(chapterOverride.Value, i);
+                        return ReferencePointResult.Success(new ReferencePoint(chapterOverride.Value, i), chapterOverride.Value);
                     }
                     else
                     {
                         if (i > maxChapter)
                         {
-                            errorMessage = "Chapter exceed max chapter";
-                            return default;
+                            return ReferencePointResult.Error("Chapter exceeds max chapter");
                         }
 
-                        if(i <= 0)
+                        if (i <= 0)
                         {
-                            errorMessage = "Chapter cannot be less than or equal to 0";
-                            return default;
+                            return ReferencePointResult.Error("Chapter cannot be less than or equal to 0");
                         }
 
-                        return new ReferencePoint(i);
+                        return ReferencePointResult.Success(ReferencePoint.WholeChapter(i), chapterOverride);
                     }
                 }
             }
             catch (Exception ex)
             {
-                errorMessage = ex.Message;
-                return default;
+                return ReferencePointResult.Error(ex.Message);
             }
-        } 
-        #endregion
+        }
 
+        private static bool IsEqual(string? a, string? b, CultureInfo? culture)
+        {
+            var comparer = culture?.CompareInfo?.GetStringComparer(CompareOptions.IgnoreCase) ?? StringComparer.OrdinalIgnoreCase;
+            return comparer.Equals(a, b);
+        }
+
+        private class ReferenceResult
+        {
+            private ReferenceResult(bool isSuccessful, Reference? reference, string? errorMessage)
+            {
+                IsSuccessful = isSuccessful;
+                Reference = reference;
+                ErrorMessage = errorMessage;
+            }
+
+            public static ReferenceResult Success(Reference reference)
+                => new ReferenceResult(true, reference, null);
+
+            public static ReferenceResult Error(string errorMessage)
+                => new ReferenceResult(false, null, errorMessage);
+
+            public bool IsSuccessful { get; }
+
+            public Reference? Reference { get; }
+
+            public string? ErrorMessage { get; }
+        }
+
+        private class ReferenceBookResult
+        {
+            private ReferenceBookResult(bool isSuccessful, BibleBook? book, string? errorMessage)
+            {
+                IsSuccessful = isSuccessful;
+                Book = book;
+                ErrorMessage = errorMessage;
+            }
+
+            public static ReferenceBookResult Success(BibleBook book)
+                => new ReferenceBookResult(true, book, null);
+
+            public static ReferenceBookResult Error(string errorMessage)
+                => new ReferenceBookResult(false, null, errorMessage);
+
+            public bool IsSuccessful { get; }
+
+            public BibleBook? Book { get; }
+
+            public string? ErrorMessage { get; }
+        }
+
+        private class ReferenceSegmentResult
+        {
+            private ReferenceSegmentResult(bool isSuccessful, IList<ReferenceSegment>? segments, string? errorMessage)
+            {
+                IsSuccessful = isSuccessful;
+                Segments = segments;
+                ErrorMessage = errorMessage;
+            }
+
+            public static ReferenceSegmentResult Success(IList<ReferenceSegment> segments)
+                => new ReferenceSegmentResult(true, segments, null);
+
+            public static ReferenceSegmentResult Error(string errorMessage)
+                => new ReferenceSegmentResult(false, null, errorMessage);
+
+            public bool IsSuccessful { get; }
+
+            public IList<ReferenceSegment>? Segments { get; }
+
+            public string? ErrorMessage { get; }
+        }
+
+        private class ReferencePointResult
+        {
+            private ReferencePointResult(bool isSuccessful, ReferencePoint? point, int? chapterOverride, string? errorMessage)
+            {
+                IsSuccessful = isSuccessful;
+                Point = point;
+                ChapterOverride = chapterOverride;
+                ErrorMessage = errorMessage;
+            }
+
+            public static ReferencePointResult Success(ReferencePoint point, int? chapterOverride)
+                => new ReferencePointResult(true, point, chapterOverride, null);
+
+            public static ReferencePointResult Error(string errorMessage)
+                => new ReferencePointResult(false, null, null, errorMessage);
+
+            public bool IsSuccessful { get; }
+
+            public ReferencePoint? Point { get; }
+
+            public int? ChapterOverride { get; }
+
+            public string? ErrorMessage { get; }
+        }
     }
+
 }
