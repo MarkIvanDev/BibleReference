@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <PackageId>BibleReference</PackageId>
-    <PackageVersion>2.0.0-dev.1</PackageVersion>
+    <PackageVersion>2.0.0-dev.2</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
     <Description>A library to parse text into bible references in multiple locales.</Description>
@@ -21,6 +21,8 @@
     <PackageTags>bible reference book chapter verse parser</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
