@@ -1,19 +1,18 @@
 ﻿using System.Collections;
 using BibleBooks;
 
-namespace BibleReference.Tests
+namespace BibleReference.Tests;
+
+public class CultureInfoGenerator : IEnumerable<object?[]>
 {
-    public class CultureInfoGenerator : IEnumerable<object?[]>
+    private readonly List<object?[]> _data = new List<object?[]>()
     {
-        private readonly List<object?[]> _data = new List<object?[]>()
-        {
-            new object?[] { null },
-            new object?[] { CultureInfos.En },
-            new object?[] { CultureInfos.Fil },
-        };
+        new object?[] { null },
+        new object?[] { CultureInfos.En },
+        new object?[] { CultureInfos.FilPH },
+    };
 
-        public IEnumerator<object?[]> GetEnumerator() => _data.GetEnumerator();
+    public IEnumerator<object?[]> GetEnumerator() => _data.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

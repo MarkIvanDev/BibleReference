@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks" Version="2.0.0-dev.4" />
+    <PackageReference Include="BibleBooks" Version="2.0.0-dev.7" />
   </ItemGroup>
 
 </Project>
