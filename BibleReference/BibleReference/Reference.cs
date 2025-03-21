@@ -28,104 +28,103 @@ using System.Linq;
 using System.Text;
 using BibleBooks;
 
-namespace BibleReference
+namespace BibleReference;
+
+public sealed class Reference : IEquatable<Reference>
 {
-    public readonly struct Reference : IEquatable<Reference>
+    public Reference(BibleBook book, params ReferenceSegment[]? segments) : this(book, segments?.ToList())
     {
-        public Reference(BibleBook book, params ReferenceSegment[]? segments) : this(book, segments?.ToList())
+    }
+
+    public Reference(BibleBook book, IList<ReferenceSegment>? segments)
+    {
+        if (segments == null)
         {
+            throw new ArgumentNullException(nameof(segments));
         }
 
-        public Reference(BibleBook book, IList<ReferenceSegment>? segments)
+        Book = book;
+        Segments = new ReadOnlyCollection<ReferenceSegment>(segments);
+    }
+
+    public BibleBook Book { get; }
+
+    public ReadOnlyCollection<ReferenceSegment> Segments { get; }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Reference reference && Equals(reference);
+    }
+
+    public bool Equals(Reference other)
+    {
+        return Book == other.Book &&
+            Segments.SequenceEqual(other.Segments);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = -966783545;
+        hashCode = (hashCode * -1521134295) + Book.GetHashCode();
+        foreach (var segment in Segments)
         {
-            if (segments == null)
+            hashCode = (hashCode * -1521134295) + segment.GetHashCode();
+        }
+        return hashCode;
+    }
+
+    public override string ToString()
+    {
+        return ToString(null);
+    }
+
+    public string ToString(CultureInfo? culture)
+    {
+        var builder = new StringBuilder();
+        builder.Append(BibleBooksHelper.GetName(Book, culture));
+        if (Segments.Count != 0)
+        {
+            builder.Append(" ");
+        }
+        for (int i = 0; i < Segments.Count; i++)
+        {
+            if (i == 0)
             {
-                throw new ArgumentNullException(nameof(segments));
+                builder.Append(Segments[i].ToString());
             }
-
-            Book = book;
-            Segments = new ReadOnlyCollection<ReferenceSegment>(segments);
-        }
-
-        public BibleBook Book { get; }
-
-        public ReadOnlyCollection<ReferenceSegment> Segments { get; }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Reference reference && Equals(reference);
-        }
-
-        public bool Equals(Reference other)
-        {
-            return Book == other.Book &&
-                Segments.SequenceEqual(other.Segments);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = -966783545;
-            hashCode = hashCode * -1521134295 + Book.GetHashCode();
-            foreach (var segment in Segments)
+            else
             {
-                hashCode = hashCode * -1521134295 + segment.GetHashCode();
-            }
-            return hashCode;
-        }
-
-        public override string ToString()
-        {
-            return ToString(null);
-        }
-
-        public string ToString(CultureInfo? culture)
-        {
-            var builder = new StringBuilder();
-            builder.Append(BibleBooksHelper.GetName(Book, culture));
-            if (Segments.Count != 0)
-            {
-                builder.Append(" ");
-            }
-            for (int i = 0; i < Segments.Count; i++)
-            {
-                if (i == 0)
+                if (Segments[i - 1].Start.Chapter == Segments[i - 1].End.Chapter &&
+                    Segments[i].Start.Chapter == Segments[i].End.Chapter &&
+                    Segments[i - 1].Start.Chapter == Segments[i].Start.Chapter &&
+                    Segments[i - 1].Start.Verse != 0 &&
+                    Segments[i].Start.Verse != 0)
                 {
-                    builder.Append(Segments[i].ToString());
-                }
-                else
-                {
-                    if (Segments[i - 1].Start.Chapter == Segments[i - 1].End.Chapter &&
-                        Segments[i].Start.Chapter == Segments[i].End.Chapter &&
-                        Segments[i - 1].Start.Chapter == Segments[i].Start.Chapter &&
-                        Segments[i -1].Start.Verse != 0 &&
-                        Segments[i].Start.Verse != 0)
+                    if (Segments[i].Start.Verse == Segments[i].End.Verse)
                     {
-                        if (Segments[i].Start.Verse == Segments[i].End.Verse)
-                        {
-                            builder.Append($",{Segments[i].Start.Verse}");
-                        }
-                        else
-                        {
-                            builder.Append($",{Segments[i].Start.Verse}-{Segments[i].End.Verse}");
-                        }
+                        builder.Append($",{Segments[i].Start.Verse}");
                     }
                     else
                     {
-                        builder.Append($";{Segments[i]}");
+                        builder.Append($",{Segments[i].Start.Verse}-{Segments[i].End.Verse}");
                     }
                 }
+                else
+                {
+                    builder.Append($";{Segments[i]}");
+                }
             }
-            return builder.ToString();
         }
+        return builder.ToString();
+    }
 
-        public static bool operator ==(Reference left, Reference right)
-        {
-            return left.Equals(right);
-        }
+    public static bool operator ==(Reference left, Reference right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator !=(Reference left, Reference right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(Reference left, Reference right)
+    {
+        return !(left == right);
     }
 }

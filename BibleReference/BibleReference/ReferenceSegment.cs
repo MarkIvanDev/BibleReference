@@ -24,89 +24,88 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BibleReference
+namespace BibleReference;
+
+public readonly struct ReferenceSegment : IEquatable<ReferenceSegment>
 {
-    public readonly struct ReferenceSegment : IEquatable<ReferenceSegment>
+    public ReferenceSegment(ReferencePoint start, ReferencePoint end)
     {
-        public ReferenceSegment(ReferencePoint start, ReferencePoint end)
+        if (start > end)
         {
-            if (start > end)
-            {
-                throw new ArgumentException("Start point is greater than the end point");
-            }
-
-            if (start.Verse == 0 ^ end.Verse == 0)
-            {
-                throw new ArgumentException("Start and end verses are only valid when both are 0 or both are greater than 0");
-            }
-
-            Start = start;
-            End = end;
+            throw new ArgumentException("Start point is greater than the end point");
         }
 
-        public static ReferenceSegment SingleChapter(int chapter)
-            => new ReferenceSegment(ReferencePoint.WholeChapter(chapter), ReferencePoint.WholeChapter(chapter));
-
-        public static ReferenceSegment MultipleChapters(int start, int end)
-            => new ReferenceSegment(ReferencePoint.WholeChapter(start), ReferencePoint.WholeChapter(end));
-
-        public static ReferenceSegment SingleVerse(int chapter, int verse)
-            => new ReferenceSegment(new ReferencePoint(chapter, verse), new ReferencePoint(chapter, verse));
-
-        public static ReferenceSegment MultipleVerses(int chapter, int startVerse, int endVerse)
-            => new ReferenceSegment(new ReferencePoint(chapter, startVerse), new ReferencePoint(chapter, endVerse));
-
-        public ReferencePoint Start { get; }
-
-        public ReferencePoint End { get; }
-
-        public override string ToString()
+        if (start.Verse == 0 ^ end.Verse == 0)
         {
-            var sb = new StringBuilder();
-            sb.Append(Start.ToString());
-            if(Start != End)
-            {
-                if(Start.Chapter == End.Chapter)
-                {
-                    sb.Append($"-{End.Verse}");
-                }
-                else
-                {
-                    sb.Append($"-{End.ToString()}");
-                }
-            }
-            return sb.ToString();
+            throw new ArgumentException("Start and end verses are only valid when both are 0 or both are greater than 0");
         }
 
-        #region Equality
-        public override bool Equals(object? obj)
-        {
-            return obj is ReferenceSegment segment && Equals(segment);
-        }
-
-        public bool Equals(ReferenceSegment other)
-        {
-            return Start.Equals(other.Start) &&
-                   End.Equals(other.End);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = -1676728671;
-            hashCode = hashCode * -1521134295 + EqualityComparer<ReferencePoint>.Default.GetHashCode(Start);
-            hashCode = hashCode * -1521134295 + EqualityComparer<ReferencePoint>.Default.GetHashCode(End);
-            return hashCode;
-        }
-
-        public static bool operator ==(ReferenceSegment segment1, ReferenceSegment segment2)
-        {
-            return segment1.Equals(segment2);
-        }
-
-        public static bool operator !=(ReferenceSegment segment1, ReferenceSegment segment2)
-        {
-            return !(segment1 == segment2);
-        } 
-        #endregion
+        Start = start;
+        End = end;
     }
+
+    public static ReferenceSegment SingleChapter(int chapter)
+        => new ReferenceSegment(ReferencePoint.WholeChapter(chapter), ReferencePoint.WholeChapter(chapter));
+
+    public static ReferenceSegment MultipleChapters(int start, int end)
+        => new ReferenceSegment(ReferencePoint.WholeChapter(start), ReferencePoint.WholeChapter(end));
+
+    public static ReferenceSegment SingleVerse(int chapter, int verse)
+        => new ReferenceSegment(new ReferencePoint(chapter, verse), new ReferencePoint(chapter, verse));
+
+    public static ReferenceSegment MultipleVerses(int chapter, int startVerse, int endVerse)
+        => new ReferenceSegment(new ReferencePoint(chapter, startVerse), new ReferencePoint(chapter, endVerse));
+
+    public ReferencePoint Start { get; }
+
+    public ReferencePoint End { get; }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(Start.ToString());
+        if (Start != End)
+        {
+            if (Start.Chapter == End.Chapter)
+            {
+                sb.Append($"-{End.Verse}");
+            }
+            else
+            {
+                sb.Append($"-{End}");
+            }
+        }
+        return sb.ToString();
+    }
+
+    #region Equality
+    public override bool Equals(object? obj)
+    {
+        return obj is ReferenceSegment segment && Equals(segment);
+    }
+
+    public bool Equals(ReferenceSegment other)
+    {
+        return Start.Equals(other.Start) &&
+               End.Equals(other.End);
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = -1676728671;
+        hashCode = (hashCode * -1521134295) + EqualityComparer<ReferencePoint>.Default.GetHashCode(Start);
+        hashCode = (hashCode * -1521134295) + EqualityComparer<ReferencePoint>.Default.GetHashCode(End);
+        return hashCode;
+    }
+
+    public static bool operator ==(ReferenceSegment segment1, ReferenceSegment segment2)
+    {
+        return segment1.Equals(segment2);
+    }
+
+    public static bool operator !=(ReferenceSegment segment1, ReferenceSegment segment2)
+    {
+        return !(segment1 == segment2);
+    }
+    #endregion
 }

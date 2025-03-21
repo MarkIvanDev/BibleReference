@@ -21,115 +21,113 @@
 // SOFTWARE. 
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace BibleReference
+namespace BibleReference;
+
+public readonly struct ReferencePoint : IEquatable<ReferencePoint>, IComparable<ReferencePoint>
 {
-    public readonly struct ReferencePoint : IEquatable<ReferencePoint>, IComparable<ReferencePoint>
+    public ReferencePoint(int chapter, int verse)
     {
-        public ReferencePoint(int chapter, int verse)
+        if (chapter <= 0)
         {
-            if(chapter <= 0)
-            {
-                throw new ArgumentException("Chapter number cannot be less than or equal to 0", nameof(chapter));
-            }
-
-            if (verse < 0)
-            {
-                throw new ArgumentException("Verse number cannot be less than 0", nameof(verse));
-            }
-
-            Chapter = chapter;
-            Verse = verse;
+            throw new ArgumentException("Chapter number cannot be less than or equal to 0", nameof(chapter));
         }
 
-        public static ReferencePoint WholeChapter(int chapter)
+        if (verse < 0)
         {
-            return new ReferencePoint(chapter, 0);
+            throw new ArgumentException("Verse number cannot be less than 0", nameof(verse));
         }
 
-        public int Chapter { get; }
-
-        public int Verse { get; }
-
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.Append(Chapter);
-            if(Verse != 0)
-            {
-                sb.Append($":{Verse}");
-            }
-
-            return sb.ToString();
-        }
-
-        #region Equality and Inequality
-        public int CompareTo(ReferencePoint other)
-        {
-            if (Equals(other))
-            {
-                return 0;
-            }
-            else if (Chapter == other.Chapter)
-            {
-                return Verse < other.Verse ? -1 : 1;
-            }
-            else
-            {
-                return Chapter < other.Chapter ? -1 : 1;
-            }
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ReferencePoint point && Equals(point);
-        }
-
-        public bool Equals(ReferencePoint other)
-        {
-            return Chapter == other.Chapter &&
-                   Verse == other.Verse;
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 1671737298;
-            hashCode = hashCode * -1521134295 + Chapter.GetHashCode();
-            hashCode = hashCode * -1521134295 + Verse.GetHashCode();
-            return hashCode;
-        }
-
-        public static bool operator ==(ReferencePoint point1, ReferencePoint point2)
-        {
-            return point1.Equals(point2);
-        }
-
-        public static bool operator !=(ReferencePoint point1, ReferencePoint point2)
-        {
-            return !(point1 == point2);
-        }
-
-        public static bool operator <(ReferencePoint point1, ReferencePoint point2)
-        {
-            return point1.CompareTo(point2) < 0;
-        }
-
-        public static bool operator <=(ReferencePoint point1, ReferencePoint point2)
-        {
-            return point1.CompareTo(point2) <= 0;
-        }
-
-        public static bool operator >(ReferencePoint point1, ReferencePoint point2)
-        {
-            return point1.CompareTo(point2) > 0;
-        }
-
-        public static bool operator >=(ReferencePoint point1, ReferencePoint point2)
-        {
-            return point1.CompareTo(point2) >= 0;
-        } 
-        #endregion
+        Chapter = chapter;
+        Verse = verse;
     }
+
+    public static ReferencePoint WholeChapter(int chapter)
+    {
+        return new ReferencePoint(chapter, 0);
+    }
+
+    public int Chapter { get; }
+
+    public int Verse { get; }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(Chapter);
+        if (Verse != 0)
+        {
+            sb.Append($":{Verse}");
+        }
+
+        return sb.ToString();
+    }
+
+    #region Equality and Inequality
+    public int CompareTo(ReferencePoint other)
+    {
+        if (Equals(other))
+        {
+            return 0;
+        }
+        else if (Chapter == other.Chapter)
+        {
+            return Verse < other.Verse ? -1 : 1;
+        }
+        else
+        {
+            return Chapter < other.Chapter ? -1 : 1;
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ReferencePoint point && Equals(point);
+    }
+
+    public bool Equals(ReferencePoint other)
+    {
+        return Chapter == other.Chapter &&
+               Verse == other.Verse;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 1671737298;
+        hashCode = (hashCode * -1521134295) + Chapter.GetHashCode();
+        hashCode = (hashCode * -1521134295) + Verse.GetHashCode();
+        return hashCode;
+    }
+
+    public static bool operator ==(ReferencePoint point1, ReferencePoint point2)
+    {
+        return point1.Equals(point2);
+    }
+
+    public static bool operator !=(ReferencePoint point1, ReferencePoint point2)
+    {
+        return !(point1 == point2);
+    }
+
+    public static bool operator <(ReferencePoint point1, ReferencePoint point2)
+    {
+        return point1.CompareTo(point2) < 0;
+    }
+
+    public static bool operator <=(ReferencePoint point1, ReferencePoint point2)
+    {
+        return point1.CompareTo(point2) <= 0;
+    }
+
+    public static bool operator >(ReferencePoint point1, ReferencePoint point2)
+    {
+        return point1.CompareTo(point2) > 0;
+    }
+
+    public static bool operator >=(ReferencePoint point1, ReferencePoint point2)
+    {
+        return point1.CompareTo(point2) >= 0;
+    }
+    #endregion
 }
