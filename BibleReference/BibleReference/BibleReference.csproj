@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>BibleReference</PackageId>
+    <PackageId>BibleReference$(suffix)</PackageId>
     <PackageVersion>2.0.0-dev.2</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
@@ -20,7 +20,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>bible reference book chapter verse parser</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
@@ -30,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks" Version="2.0.0-dev.7" />
+    <PackageReference Include="BibleBooks$(suffix)" Version="2.0.0-dev.7" />
   </ItemGroup>
 
 </Project>

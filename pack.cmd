@@ -1,0 +1,1 @@
+pwsh -ExecutionPolicy Bypass .\pack.ps1
