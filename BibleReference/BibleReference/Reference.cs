@@ -85,35 +85,7 @@ public sealed class Reference : IEquatable<Reference>
         if (Segments.Count != 0)
         {
             builder.Append(" ");
-        }
-        for (int i = 0; i < Segments.Count; i++)
-        {
-            if (i == 0)
-            {
-                builder.Append(Segments[i].ToString());
-            }
-            else
-            {
-                if (Segments[i - 1].Start.Chapter == Segments[i - 1].End.Chapter &&
-                    Segments[i].Start.Chapter == Segments[i].End.Chapter &&
-                    Segments[i - 1].Start.Chapter == Segments[i].Start.Chapter &&
-                    Segments[i - 1].Start.Verse != 0 &&
-                    Segments[i].Start.Verse != 0)
-                {
-                    if (Segments[i].Start.Verse == Segments[i].End.Verse)
-                    {
-                        builder.Append($",{Segments[i].Start.Verse}");
-                    }
-                    else
-                    {
-                        builder.Append($",{Segments[i].Start.Verse}-{Segments[i].End.Verse}");
-                    }
-                }
-                else
-                {
-                    builder.Append($";{Segments[i]}");
-                }
-            }
+            builder.Append(Segments.Stringify());
         }
         return builder.ToString();
     }

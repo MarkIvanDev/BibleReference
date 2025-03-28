@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using BibleBooks;
+using BibleReference.Tests.Generators;
 
 namespace BibleReference.Tests;
 
@@ -212,6 +213,47 @@ public class ParseTests
                 Assert.Equal($"{name} 1:1,3-5", BibleReferenceParser.Parse($"{name} 1,3-5", culture).ToString(culture));
             }
         }
+    }
+
+    [Theory(DisplayName = "Segment Only Parsing")]
+    [ClassData(typeof(SegmentGenerator))]
+    public void SegmentParsing(string text, int? maxChapter, IList<ReferenceSegment> segments, bool expected)
+    {
+        var isSuccessful = maxChapter.HasValue
+            ? BibleReferenceParser.TryParseSegments(text, maxChapter.Value, out var result)
+            : BibleReferenceParser.TryParseSegments(text, out result);
+        if (expected)
+        {
+            Assert.Equal(result, segments);
+        }
+        else
+        {
+            Assert.Null(result);
+        }
+        Assert.Equal(isSuccessful, expected);
+    }
+
+    [Theory(DisplayName = "Point Only Parsing")]
+    [ClassData(typeof(PointGenerator))]
+    public void PointParsing(string text, int? maxChapter, int? chapterOverride, ReferencePoint point, bool expected)
+    {
+        ReferencePoint? result;
+        var isSuccessful = (maxChapter, chapterOverride) switch
+        {
+            (null, null) => BibleReferenceParser.TryParsePoint(text, out result),
+            (not null, null) => BibleReferenceParser.TryParsePoint(text, maxChapter.Value, null, out result),
+            (not null, not null) => BibleReferenceParser.TryParsePoint(text, maxChapter.Value, chapterOverride.Value, out result),
+            (null, not null) => BibleReferenceParser.TryParsePoint(text, int.MaxValue, chapterOverride.Value, out result),
+        };
+        if (expected)
+        {
+            Assert.Equal(result, point);
+        }
+        else
+        {
+            Assert.Null(result);
+        }
+        Assert.Equal(isSuccessful, expected);
     }
 
 }

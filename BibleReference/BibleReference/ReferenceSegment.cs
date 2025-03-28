@@ -109,3 +109,41 @@ public readonly struct ReferenceSegment : IEquatable<ReferenceSegment>
     }
     #endregion
 }
+
+public static class ReferenceSegmentExtensions
+{
+    public static string Stringify(this IList<ReferenceSegment> segments)
+    {
+        var builder = new StringBuilder();
+        for (int i = 0; i < segments.Count; i++)
+        {
+            if (i == 0)
+            {
+                builder.Append(segments[i].ToString());
+            }
+            else
+            {
+                if (segments[i - 1].Start.Chapter == segments[i - 1].End.Chapter &&
+                    segments[i].Start.Chapter == segments[i].End.Chapter &&
+                    segments[i - 1].Start.Chapter == segments[i].Start.Chapter &&
+                    segments[i - 1].Start.Verse != 0 &&
+                    segments[i].Start.Verse != 0)
+                {
+                    if (segments[i].Start.Verse == segments[i].End.Verse)
+                    {
+                        builder.Append($",{segments[i].Start.Verse}");
+                    }
+                    else
+                    {
+                        builder.Append($",{segments[i].Start.Verse}-{segments[i].End.Verse}");
+                    }
+                }
+                else
+                {
+                    builder.Append($";{segments[i]}");
+                }
+            }
+        }
+        return builder.ToString();
+    }
+}
