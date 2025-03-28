@@ -50,6 +50,66 @@ public static class BibleReferenceParser
         return referenceResult.IsSuccessful;
     }
 
+    public static IList<ReferenceSegment> ParseSegments(string? text)
+    {
+        return ParseSegments(text, int.MaxValue);
+    }
+
+    public static bool TryParseSegments(string? text, out IList<ReferenceSegment>? segments)
+    {
+        return TryParseSegments(text, int.MaxValue, out segments);
+    }
+
+    public static IList<ReferenceSegment> ParseSegments(string? text, int maxChapter)
+    {
+        var segmentResult = InternalParseSegments(text ?? string.Empty, maxChapter);
+        if (segmentResult.IsSuccessful && segmentResult.Segments is not null)
+        {
+            return segmentResult.Segments;
+        }
+        else
+        {
+            throw new Exception(segmentResult.ErrorMessage);
+        }
+    }
+
+    public static bool TryParseSegments(string? text, int maxChapter, out IList<ReferenceSegment>? segments)
+    {
+        var segmentsResult = InternalParseSegments(text ?? string.Empty, maxChapter);
+        segments = segmentsResult.Segments;
+        return segmentsResult.IsSuccessful;
+    }
+
+    public static ReferencePoint ParsePoint(string? text)
+    {
+        return ParsePoint(text, int.MaxValue, null);
+    }
+
+    public static bool TryParsePoint(string? text, out ReferencePoint? point)
+    {
+        return TryParsePoint(text, int.MaxValue, null, out point);
+    }
+
+    public static ReferencePoint ParsePoint(string? text, int maxChapter, int? chapterOverride)
+    {
+        var pointResult = InternalParsePoint(text ?? string.Empty, maxChapter, chapterOverride);
+        if (pointResult.IsSuccessful && pointResult.Point.HasValue)
+        {
+            return pointResult.Point.Value;
+        }
+        else
+        {
+            throw new Exception(pointResult.ErrorMessage);
+        }
+    }
+
+    public static bool TryParsePoint(string? text, int maxChapter, int? chapterOverride, out ReferencePoint? point)
+    {
+        var pointResult = InternalParsePoint(text ?? string.Empty, maxChapter, chapterOverride);
+        point = pointResult.Point;
+        return pointResult.IsSuccessful;
+    }
+
     private static ReferenceResult InternalParse(string text, CultureInfo? culture = null)
     {
         var textTrimmed = text.Trim();
