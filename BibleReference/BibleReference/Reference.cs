@@ -100,3 +100,12 @@ public sealed class Reference : IEquatable<Reference>
         return !(left == right);
     }
 }
+
+public static class ReferenceExtensions
+{
+    public static Reference Simplify(this Reference reference)
+    {
+        var simplifiedSegments = reference.Segments.Simplify();
+        return new Reference(reference.Book, simplifiedSegments);
+    }
+}

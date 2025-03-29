@@ -1,4 +1,6 @@
-﻿namespace BibleReference.Tests;
+﻿using BibleReference.Tests.Generators;
+
+namespace BibleReference.Tests;
 
 public class ReferenceSegmentTests
 {
@@ -58,6 +60,27 @@ public class ReferenceSegmentTests
     public void MultipleVersesToString()
     {
         Assert.Equal("1:1-5", ReferenceSegment.MultipleVerses(1, 1, 5).ToString());
+    }
+
+    [Theory(DisplayName = "Has Intersection")]
+    [ClassData(typeof(HasIntersectionGenerator))]
+    public void HasIntersection(ReferenceSegment segment1, ReferenceSegment segment2, bool hasIntersection)
+    {
+        Assert.Equal(hasIntersection, segment1.HasIntersection(segment2));
+    }
+
+    [Theory(DisplayName = "Is Continuous")]
+    [ClassData(typeof(IsContinuousGenerator))]
+    public void IsContinuous(ReferenceSegment segment1, ReferenceSegment segment2, bool isContinuous)
+    {
+        Assert.Equal(isContinuous, segment1.IsContinuous(segment2));
+    }
+
+    [Theory(DisplayName = "Simplify Segments")]
+    [ClassData(typeof(SimplifySegmentsGenerator))]
+    public void Simplify(IList<ReferenceSegment> segments, IList<ReferenceSegment> simplifiedSegments)
+    {
+        Assert.Equal(simplifiedSegments, segments.Simplify());
     }
 
 }

@@ -237,13 +237,12 @@ public class ParseTests
     [ClassData(typeof(PointGenerator))]
     public void PointParsing(string text, int? maxChapter, int? chapterOverride, ReferencePoint point, bool expected)
     {
-        ReferencePoint? result;
-        var isSuccessful = (maxChapter, chapterOverride) switch
+        var (isSuccessful, result) = (maxChapter, chapterOverride) switch
         {
-            (null, null) => BibleReferenceParser.TryParsePoint(text, out result),
-            (not null, null) => BibleReferenceParser.TryParsePoint(text, maxChapter.Value, null, out result),
-            (not null, not null) => BibleReferenceParser.TryParsePoint(text, maxChapter.Value, chapterOverride.Value, out result),
-            (null, not null) => BibleReferenceParser.TryParsePoint(text, int.MaxValue, chapterOverride.Value, out result),
+            (null, null) => (BibleReferenceParser.TryParsePoint(text, out var r), r),
+            (not null, null) => (BibleReferenceParser.TryParsePoint(text, maxChapter.Value, null, out var r), r),
+            (not null, not null) => (BibleReferenceParser.TryParsePoint(text, maxChapter.Value, chapterOverride.Value, out var r), r),
+            (null, not null) => (BibleReferenceParser.TryParsePoint(text, int.MaxValue, chapterOverride.Value, out var r), r),
         };
         if (expected)
         {
