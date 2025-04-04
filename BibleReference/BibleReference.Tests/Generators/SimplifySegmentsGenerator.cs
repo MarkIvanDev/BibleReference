@@ -107,6 +107,28 @@ public class SimplifySegmentsGenerator : IEnumerable<object?[]>
                 new(new ReferencePoint(1, 2), new ReferencePoint(2, 5)),
             }
         ],
+        [
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleChapter(1),
+                ReferenceSegment.SingleChapter(2),
+            },
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.MultipleChapters(1, 2),
+            }
+        ],
+        [
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleChapter(1),
+                ReferenceSegment.SingleVerse(2, 1),
+            },
+            new List<ReferenceSegment>
+            {
+                new(new ReferencePoint(1, 1), new ReferencePoint(2, 1)),
+            }
+        ],
     ];
 
     public IEnumerator<object?[]> GetEnumerator() => _data.GetEnumerator();

@@ -184,6 +184,13 @@ public static class ReferenceSegmentExtensions
         return builder.ToString();
     }
 
+    public static ReferencePoint ComputedStart(this ReferenceSegment segment)
+    {
+        return segment.Start.Verse == 0
+            ? new ReferencePoint(segment.Start.Chapter, 1)
+            : segment.Start;
+    }
+
     public static ReferencePoint ComputedEnd(this ReferenceSegment segment)
     {
         return segment.End.Verse == 0
@@ -193,58 +200,81 @@ public static class ReferenceSegmentExtensions
 
     public static bool IsSingleVerse(this ReferenceSegment segment)
     {
-        return segment.Start == segment.End;
+        return segment.ComputedStart() == segment.ComputedEnd();
     }
 
     public static bool HasIntersection(this ReferenceSegment segment1, ReferenceSegment segment2)
     {
-        return (segment1.Start <= segment2.Start && segment1.ComputedEnd() >= segment2.ComputedEnd()) ||
-            (segment2.Start <= segment1.Start && segment2.ComputedEnd() >= segment1.ComputedEnd()) ||
-            (segment1.Start <= segment2.Start && segment2.Start <= segment1.ComputedEnd() && segment1.ComputedEnd() <= segment2.ComputedEnd()) ||
-            (segment2.Start <= segment1.Start && segment1.Start <= segment2.ComputedEnd() && segment2.ComputedEnd() <= segment1.ComputedEnd());
+        return (segment1.ComputedStart() <= segment2.ComputedStart() &&
+            segment2.ComputedStart() <= segment1.ComputedEnd()) ||
+            (segment2.ComputedStart() <= segment1.ComputedStart() &&
+            segment1.ComputedStart() <= segment2.ComputedEnd());
+    }
+
+    public static bool IsInside(this ReferenceSegment segment1, ReferenceSegment segment2)
+    {
+        return segment2.ComputedStart() <= segment1.ComputedStart() && segment2.ComputedEnd() >= segment1.ComputedEnd();
     }
 
     public static bool IsContinuous(this ReferenceSegment segment1, ReferenceSegment segment2)
     {
-        return segment1.Start.Chapter == segment2.Start.Chapter && segment1.End.Verse != 0 && segment2.End.Verse != 0 &&
-            (segment2.Start.Verse - segment1.End.Verse == 1 || segment1.Start.Verse - segment2.End.Verse == 1);
+        var (start, end) = segment1 < segment2 ? (segment1, segment2) : (segment2, segment1);
+
+        if (start.End.Chapter == end.Start.Chapter &&
+            start.End.Verse != 0 && end.Start.Verse != 0 &&
+            end.Start.Verse - start.End.Verse == 1)
+        {
+            return true;
+        }
+        else if (start.End.Chapter != end.Start.Chapter &&
+            start.End.Verse == 0 && end.Start.Verse == 0 &&
+            end.Start.Chapter - start.End.Chapter == 1)
+        {
+            return true;
+        }
+        else if (start.End.Chapter != end.Start.Chapter &&
+            start.End.Verse == 0 && end.Start.Verse == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+        //return segment1.Start.Chapter == segment2.Start.Chapter && segment1.End.Verse != 0 && segment2.End.Verse != 0 &&
+        //    (segment2.Start.Verse - segment1.End.Verse == 1 || segment1.Start.Verse - segment2.End.Verse == 1);
     }
 
     public static IList<ReferenceSegment> Union(this ReferenceSegment segment1, ReferenceSegment segment2)
     {
         // Case 1: segment2 is inside segment1
-        if (segment1.Start <= segment2.Start && segment1.ComputedEnd() >= segment2.ComputedEnd())
+        if (segment2.IsInside(segment1))
         {
             return [segment1];
         }
         // Case 2: segment1 is inside segment2
-        else if (segment2.Start <= segment1.Start && segment2.ComputedEnd() >= segment1.ComputedEnd())
+        else if (segment1.IsInside(segment2))
         {
             return [segment2];
         }
-        // Case 3: segment1 and segment2 only partially intersect
-        else if ((segment1.Start <= segment2.Start && segment2.Start <= segment1.ComputedEnd() && segment1.ComputedEnd() <= segment2.ComputedEnd()) ||
-            (segment2.Start <= segment1.Start && segment1.Start <= segment2.ComputedEnd() && segment2.ComputedEnd() <= segment1.ComputedEnd()))
+        // Case 3: segment1 and segment2  intersect or continuous
+        else if (segment1.HasIntersection(segment2) || segment1.IsContinuous(segment2))
         {
-            var newStart = segment1.Start.CompareTo(segment2.Start) < 0 ? segment1.Start : segment2.Start;
-            var newEnd = segment1.ComputedEnd().CompareTo(segment2.ComputedEnd()) > 0 ? segment1.End : segment2.End;
+            var newStart = segment1.ComputedStart() < segment2.ComputedStart() ? segment1.Start : segment2.Start;
+            var newEnd = segment1.ComputedEnd() > segment2.ComputedEnd() ? segment1.End : segment2.End;
+
+            if (newStart.Verse == 0 && newEnd.Verse != 0)
+            {
+                newStart = new ReferencePoint(newStart.Chapter, 1);
+            }
+
             return [new ReferenceSegment(newStart, newEnd)];
         }
-        // Case 4: segment1 and segment 2 do not intersect
+        // Case 4: segment1 and segment 2 do not intersect and are not continuous
         else
         {
-            // Case 4.a: segment1 and segment2 are continuous
-            if (segment1.Start.Chapter == segment2.Start.Chapter && segment1.End.Verse != 0 && segment2.End.Verse != 0 &&
-                (segment2.Start.Verse - segment1.End.Verse == 1 || segment1.Start.Verse - segment2.End.Verse == 1))
-            {
-                var newStart = segment1.Start.CompareTo(segment2.Start) < 0 ? segment1.Start : segment2.Start;
-                var newEnd = segment1.ComputedEnd().CompareTo(segment2.ComputedEnd()) > 0 ? segment1.End : segment2.End;
-                return [new ReferenceSegment(newStart, newEnd)];
-            }
-            else
-            {
-                return [segment1, segment2];
-            }
+            return [segment1, segment2];
         }
     }
 
