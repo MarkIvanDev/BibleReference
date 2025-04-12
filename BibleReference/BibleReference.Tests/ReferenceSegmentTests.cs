@@ -62,6 +62,13 @@ public class ReferenceSegmentTests
         Assert.Equal("1:1-5", ReferenceSegment.MultipleVerses(1, 1, 5).ToString());
     }
 
+    [Theory(DisplayName = "Is Inside")]
+    [ClassData(typeof(IsInsideGenerator))]
+    public void IsInside(ReferenceSegment segment1, ReferenceSegment segment2, bool isInside)
+    {
+        Assert.Equal(isInside, segment1.IsInside(segment2));
+    }
+
     [Theory(DisplayName = "Has Intersection")]
     [ClassData(typeof(HasIntersectionGenerator))]
     public void HasIntersection(ReferenceSegment segment1, ReferenceSegment segment2, bool hasIntersection)
