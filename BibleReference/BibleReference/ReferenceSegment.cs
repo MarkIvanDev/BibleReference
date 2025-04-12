@@ -241,9 +241,6 @@ public static class ReferenceSegmentExtensions
         {
             return false;
         }
-
-        //return segment1.Start.Chapter == segment2.Start.Chapter && segment1.End.Verse != 0 && segment2.End.Verse != 0 &&
-        //    (segment2.Start.Verse - segment1.End.Verse == 1 || segment1.Start.Verse - segment2.End.Verse == 1);
     }
 
     public static IList<ReferenceSegment> Union(this ReferenceSegment segment1, ReferenceSegment segment2)
@@ -280,7 +277,10 @@ public static class ReferenceSegmentExtensions
 
     public static IList<ReferenceSegment> Simplify(this IList<ReferenceSegment> segments)
     {
-        var unionSegments = segments.OrderBy(i => i).ToList();
+        var unionSegments = segments
+            .Distinct()
+            .OrderBy(i => i)
+            .ToList();
         do
         {
             for (var i = 0; i < unionSegments.Count; i++)

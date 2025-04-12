@@ -9,6 +9,39 @@ public class SimplifySegmentsGenerator : IEnumerable<object?[]>
             new List<ReferenceSegment>
             {
                 ReferenceSegment.SingleChapter(1),
+                ReferenceSegment.SingleChapter(1),
+            },
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleChapter(1),
+            }
+        ],
+        [
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleVerse(1, 1),
+                ReferenceSegment.SingleVerse(1, 1),
+            },
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleVerse(1, 1),
+            }
+        ],
+        [
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.MultipleVerses(1, 1, 3),
+                ReferenceSegment.MultipleVerses(1, 1, 3),
+            },
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.MultipleVerses(1, 1, 3),
+            }
+        ],
+        [
+            new List<ReferenceSegment>
+            {
+                ReferenceSegment.SingleChapter(1),
                 ReferenceSegment.SingleVerse(1, 1),
             },
             new List<ReferenceSegment>

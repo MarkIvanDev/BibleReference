@@ -8,6 +8,36 @@ public class HasIntersectionGenerator : IEnumerable<object?[]>
     [
         [
             ReferenceSegment.SingleChapter(1),
+            ReferenceSegment.SingleChapter(1),
+            true
+        ],
+        [
+            ReferenceSegment.SingleVerse(1, 1),
+            ReferenceSegment.SingleVerse(1, 1),
+            true
+        ],
+        [
+            ReferenceSegment.MultipleVerses(1, 1, 4),
+            ReferenceSegment.MultipleVerses(1, 1, 4),
+            true
+        ],
+        [
+            ReferenceSegment.SingleVerse(1, 2),
+            ReferenceSegment.MultipleVerses(1, 1, 3),
+            true
+        ],
+        [
+            ReferenceSegment.SingleVerse(1, 1),
+            ReferenceSegment.SingleChapter(1),
+            true
+        ],
+        [
+            ReferenceSegment.MultipleVerses(1, 1, 3),
+            ReferenceSegment.SingleChapter(1),
+            true
+        ],
+        [
+            ReferenceSegment.SingleChapter(1),
             ReferenceSegment.SingleVerse(1, 1),
             true,
         ],
