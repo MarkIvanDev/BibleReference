@@ -215,6 +215,13 @@ public class ParseTests
         }
     }
 
+    [Theory(DisplayName = "Invalid Text for Parsing")]
+    [ClassData(typeof(InvalidTextGenerator))]
+    public void InvalidText(string text)
+    {
+        Assert.Throws<Exception>(() => BibleReferenceParser.Parse(text));
+    }
+
     [Theory(DisplayName = "Segment Only Parsing")]
     [ClassData(typeof(SegmentGenerator))]
     public void SegmentParsing(string text, int? maxChapter, IList<ReferenceSegment> segments, bool expected)

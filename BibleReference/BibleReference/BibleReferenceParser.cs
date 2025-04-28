@@ -255,23 +255,37 @@ public static class BibleReferenceParser
             }
 
             var citations = text
-                .Split([';'], StringSplitOptions.RemoveEmptyEntries)
+                .Split([';'])
                 .Select(c => c.Trim())
-                .Where(c => !string.IsNullOrEmpty(c));
+                .ToList();
+            if (citations.Any(c => string.IsNullOrEmpty(c)))
+            {
+                return ReferenceSegmentResult.Error("Has empty citations or trailing semicolons");
+            }
+
             foreach (var citation in citations)
             {
                 int? chapterNumber = null;
                 var segments = citation
-                    .Split([','], StringSplitOptions.RemoveEmptyEntries)
+                    .Split([','])
                     .Select(s => s.Trim())
-                    .Where(s => !string.IsNullOrEmpty(s));
+                    .ToList();
+                if (segments.Any(s => string.IsNullOrEmpty(s)))
+                {
+                    return ReferenceSegmentResult.Error("Has empty segments or trailing commas");
+                }
+
                 foreach (var segment in segments)
                 {
                     var ranges = segment
-                        .Split(['-'], StringSplitOptions.RemoveEmptyEntries)
+                        .Split(['-'])
                         .Select(r => r.Trim())
-                        .Where(r => !string.IsNullOrEmpty(r))
                         .ToList();
+                    if (ranges.Any(r => string.IsNullOrEmpty(r)))
+                    {
+                        return ReferenceSegmentResult.Error("Has empty ranges or trailing dashes");
+                    }
+
                     switch (ranges.Count)
                     {
                         case 1:

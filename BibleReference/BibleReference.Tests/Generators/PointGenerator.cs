@@ -2,62 +2,62 @@
 
 namespace BibleReference.Tests.Generators;
 
-public class PointGenerator : IEnumerable<object?[]>
+public class PointGenerator : IEnumerable<TheoryDataRow<string, int?, int?, ReferencePoint, bool>>
 {
-    private readonly List<object?[]> _data =
+    private readonly List<TheoryDataRow<string, int?, int?, ReferencePoint, bool>> _data =
     [
-        [
+        (
             "1:1",
             null,
             null,
             new ReferencePoint(1, 1),
-            true,
-        ],
-        [
+            true
+        ),
+        (
             "1:1",
             1,
             null,
             new ReferencePoint(1, 1),
-            true,
-        ],
-        [
+            true
+        ),
+        (
             "1:1",
             null,
             2,
             new ReferencePoint(1, 1),
-            true,
-        ],
-        [
+            true
+        ),
+        (
             "2",
             null,
             null,
             ReferencePoint.WholeChapter(2),
-            true,
-        ],
-        [
+            true
+        ),
+        (
             "2",
             1,
             null,
             new ReferencePoint(1, 2),
-            true,
-        ],
-        [
+            true
+        ),
+        (
             "3",
             2,
             null,
             default(ReferencePoint),
-            false,
-        ],
-        [
+            false
+        ),
+        (
             "2",
             null,
             1,
             new ReferencePoint(1, 2),
-            true,
-        ],
+            true
+        ),
     ];
 
-    public IEnumerator<object?[]> GetEnumerator() => _data.GetEnumerator();
+    public IEnumerator<TheoryDataRow<string, int?, int?, ReferencePoint, bool>> GetEnumerator() => _data.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -1,18 +1,19 @@
 ﻿using System.Collections;
+using System.Globalization;
 using BibleBooks;
 
 namespace BibleReference.Tests.Generators;
 
-public class CultureInfoGenerator : IEnumerable<object?[]>
+public class CultureInfoGenerator : IEnumerable<TheoryDataRow<CultureInfo?>>
 {
-    private readonly List<object?[]> _data =
+    private readonly List<TheoryDataRow<CultureInfo?>> _data =
     [
-        [null],
-        [CultureInfos.En],
-        [CultureInfos.FilPH],
+        new TheoryDataRow<CultureInfo?>(null),
+        CultureInfos.En,
+        CultureInfos.FilPH,
     ];
 
-    public IEnumerator<object?[]> GetEnumerator() => _data.GetEnumerator();
+    public IEnumerator<TheoryDataRow<CultureInfo?>> GetEnumerator() => _data.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
