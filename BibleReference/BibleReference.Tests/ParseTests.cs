@@ -7,14 +7,11 @@ namespace BibleReference.Tests;
 public class ParseTests
 {
     [Theory(DisplayName = "Book")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void Book(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void Book(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal(name, BibleReferenceParser.Parse(name, culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal(name, BibleReferenceParser.Parse(name, culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Roman Numerals")]
@@ -26,192 +23,178 @@ public class ParseTests
     }
 
     [Theory(DisplayName = "Book Chapter")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapter(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapter(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1", BibleReferenceParser.Parse($"{name} 1", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1", BibleReferenceParser.Parse($"{name} 1", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter-Chapter")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterToChapter(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterToChapter(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) > 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) > 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1-2", BibleReferenceParser.Parse($"{name} 1-2", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1-2", BibleReferenceParser.Parse($"{name} 1-2", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is single-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Chapter:Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1", BibleReferenceParser.Parse($"{name} 1:1", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1", BibleReferenceParser.Parse($"{name} 1:1", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse-Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseToVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1-5", BibleReferenceParser.Parse($"{name} 1:1-5", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1-5", BibleReferenceParser.Parse($"{name} 1:1-5", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse,Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1,5", BibleReferenceParser.Parse($"{name} 1:1,5", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1,5", BibleReferenceParser.Parse($"{name} 1:1,5", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse,Verse-Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseVerseToVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1,5-7", BibleReferenceParser.Parse($"{name} 1:1,5-7", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1,5-7", BibleReferenceParser.Parse($"{name} 1:1,5-7", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse-Verse,Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseToVerseVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseToVerseVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1-3,8", BibleReferenceParser.Parse($"{name} 1:1-3,8", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1-3,8", BibleReferenceParser.Parse($"{name} 1:1-3,8", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse-Verse,Verse-Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseToVerseVerseToVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseToVerseVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1-5,8-10", BibleReferenceParser.Parse($"{name} 1:1-5,8-10", culture).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1-5,8-10", BibleReferenceParser.Parse($"{name} 1:1-5,8-10", culture).ToString(culture));
     }
 
     [Theory(DisplayName = "Book Chapter:Verse-Verse;Chapter:Verse-Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseToVerseAndChapterVerseToVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseToVerseAndChapterVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) > 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) > 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:1-5;2:1-3", BibleReferenceParser.Parse($"{name} 1:1-5;2:1-3", culture).ToString(culture));
-            }
-
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:1-5;2:1-3", BibleReferenceParser.Parse($"{name} 1:1-5;2:1-3", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is single-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Chapter:Verse-Chapter:Verse")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookChapterVerseToChapterVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookChapterVerseToChapterVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) > 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) > 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:5-2:3", BibleReferenceParser.Parse($"{name} 1:5-2:3", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:5-2:3", BibleReferenceParser.Parse($"{name} 1:5-2:3", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is single-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Verse (for single-chapter books)")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookSingleVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) == 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) == 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:2", BibleReferenceParser.Parse($"{name} 2", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:2", BibleReferenceParser.Parse($"{name} 2", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is multi-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Verse-Verse (for single-chapter books)")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookSingleVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) == 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) == 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:1-2", BibleReferenceParser.Parse($"{name} 1-2", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:1-2", BibleReferenceParser.Parse($"{name} 1-2", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is multi-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Verse,Verse (for single-chapter books)")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseVerse2(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookSingleVerseVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) == 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) == 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:1,2", BibleReferenceParser.Parse($"{name} 1,2", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:1,2", BibleReferenceParser.Parse($"{name} 1,2", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is multi-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Verse-Verse,Verse (for single-chapter books)")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseToVerseAndVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookSingleVerseToVerseVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) == 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) == 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:1-3,5", BibleReferenceParser.Parse($"{name} 1-3,5", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:1-3,5", BibleReferenceParser.Parse($"{name} 1-3,5", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is multi-chapter");
         }
     }
 
     [Theory(DisplayName = "Book Verse,Verse-Verse (for single-chapter books)")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseAndVerseToVerse(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void BookSingleVerseVerseToVerse(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) == 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) == 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1:1,3-5", BibleReferenceParser.Parse($"{name} 1,3-5", culture).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1:1,3-5", BibleReferenceParser.Parse($"{name} 1,3-5", culture).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is multi-chapter");
         }
     }
 
