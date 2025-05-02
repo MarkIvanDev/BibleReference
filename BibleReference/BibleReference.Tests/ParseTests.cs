@@ -161,7 +161,7 @@ public class ParseTests
 
     [Theory(DisplayName = "Book Verse-Verse (for single-chapter books)")]
     [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseVerse(CultureInfo? culture)
+    public void BookVerseToVerse(CultureInfo? culture)
     {
         foreach (var book in Enum.GetValues<BibleBook>())
         {
@@ -175,7 +175,7 @@ public class ParseTests
 
     [Theory(DisplayName = "Book Verse,Verse (for single-chapter books)")]
     [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseVerse2(CultureInfo? culture)
+    public void BookVerseVerse(CultureInfo? culture)
     {
         foreach (var book in Enum.GetValues<BibleBook>())
         {
@@ -189,7 +189,7 @@ public class ParseTests
 
     [Theory(DisplayName = "Book Verse-Verse,Verse (for single-chapter books)")]
     [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseToVerseAndVerse(CultureInfo? culture)
+    public void BookVerseToVerseVerse(CultureInfo? culture)
     {
         foreach (var book in Enum.GetValues<BibleBook>())
         {
@@ -203,7 +203,7 @@ public class ParseTests
 
     [Theory(DisplayName = "Book Verse,Verse-Verse (for single-chapter books)")]
     [ClassData(typeof(CultureInfoGenerator))]
-    public void BookVerseAndVerseToVerse(CultureInfo? culture)
+    public void BookVerseVerseToVerse(CultureInfo? culture)
     {
         foreach (var book in Enum.GetValues<BibleBook>())
         {
