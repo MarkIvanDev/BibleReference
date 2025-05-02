@@ -7,83 +7,69 @@ namespace BibleReference.Tests;
 public class ReferenceTests
 {
     [Theory(DisplayName = "Single Chapter ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void SingleChapterToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void SingleChapterToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1", new Reference(book, ReferenceSegment.SingleChapter(1)).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1", new Reference(book, ReferenceSegment.SingleChapter(1)).ToString(culture));
     }
 
     [Theory(DisplayName = "Multiple Chapters ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void MultipleChaptersToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void MultipleChaptersToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
+        if (BibleBooksHelper.GetMaxChapter(book) > 1)
         {
-            if (BibleBooksHelper.GetMaxChapter(book) > 1)
-            {
-                var name = BibleBooksHelper.GetName(book, culture);
-                Assert.Equal($"{name} 1-2", new Reference(book, ReferenceSegment.MultipleChapters(1, 2)).ToString(culture));
-            }
+            var name = BibleBooksHelper.GetName(book, culture);
+            Assert.Equal($"{name} 1-2", new Reference(book, ReferenceSegment.MultipleChapters(1, 2)).ToString(culture));
+        }
+        else
+        {
+            Assert.Skip("Book is single-chapter");
         }
     }
 
     [Theory(DisplayName = "Single Verse ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void SingleVerseToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void SingleVerseToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1", new Reference(book, ReferenceSegment.SingleVerse(1, 1)).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1", new Reference(book, ReferenceSegment.SingleVerse(1, 1)).ToString(culture));
     }
 
     [Theory(DisplayName = "Continuous Verses ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void ContinuousVersesToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void ContinuousVersesToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1-5", new Reference(book, ReferenceSegment.MultipleVerses(1, 1, 5)).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1-5", new Reference(book, ReferenceSegment.MultipleVerses(1, 1, 5)).ToString(culture));
     }
 
     [Theory(DisplayName = "Discontinuous Verses ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void DiscontinuousVersesToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void DiscontinuousVersesToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1,5",
-                new Reference(book,
-                    ReferenceSegment.SingleVerse(1, 1),
-                    ReferenceSegment.SingleVerse(1, 5)
-                ).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1,5",
+            new Reference(book,
+                ReferenceSegment.SingleVerse(1, 1),
+                ReferenceSegment.SingleVerse(1, 5)
+            ).ToString(culture));
     }
 
     [Theory(DisplayName = "Mixed ToString")]
-    [ClassData(typeof(CultureInfoGenerator))]
-    public void MixedToString(CultureInfo? culture)
+    [ClassData(typeof(BibleBookCultureInfoMatrix))]
+    public void MixedToString(BibleBook book, CultureInfo? culture)
     {
-        foreach (var book in Enum.GetValues<BibleBook>())
-        {
-            var name = BibleBooksHelper.GetName(book, culture);
-            Assert.Equal($"{name} 1:1,5,7-9,11,13",
-                new Reference(book,
-                    ReferenceSegment.SingleVerse(1, 1),
-                    ReferenceSegment.SingleVerse(1, 5),
-                    ReferenceSegment.MultipleVerses(1, 7, 9),
-                    ReferenceSegment.SingleVerse(1, 11),
-                    ReferenceSegment.SingleVerse(1, 13)
-                ).ToString(culture));
-        }
+        var name = BibleBooksHelper.GetName(book, culture);
+        Assert.Equal($"{name} 1:1,5,7-9,11,13",
+            new Reference(book,
+                ReferenceSegment.SingleVerse(1, 1),
+                ReferenceSegment.SingleVerse(1, 5),
+                ReferenceSegment.MultipleVerses(1, 7, 9),
+                ReferenceSegment.SingleVerse(1, 11),
+                ReferenceSegment.SingleVerse(1, 13)
+            ).ToString(culture));
     }
 
     [Fact(DisplayName = "== operator")]

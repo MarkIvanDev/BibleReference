@@ -365,6 +365,11 @@ public static class BibleReferenceParser
                     return ReferencePointResult.Error("Verse is not a number");
                 }
 
+                if (verse <= 0)
+                {
+                    return ReferencePointResult.Error("Verse cannot be less than or equal to 0");
+                }
+
                 return ReferencePointResult.Success(new ReferencePoint(chapter, verse), chapter);
             }
             else
@@ -383,11 +388,21 @@ public static class BibleReferenceParser
                     }
                     else
                     {
+                        if (i <= 0)
+                        {
+                            return ReferencePointResult.Error("Verse cannot be less than or equal to 0");
+                        }
+
                         return ReferencePointResult.Success(new ReferencePoint(1, i), 1);
                     }
                 }
                 else if (chapterOverride.HasValue)
                 {
+                    if (i <= 0)
+                    {
+                        return ReferencePointResult.Error("Verse cannot be less than or equal to 0");
+                    }
+
                     return ReferencePointResult.Success(new ReferencePoint(chapterOverride.Value, i), chapterOverride.Value);
                 }
                 else
@@ -428,10 +443,10 @@ public static class BibleReferenceParser
         }
 
         public static ReferenceResult Success(Reference reference)
-            => new ReferenceResult(true, reference, null);
+            => new(true, reference, null);
 
         public static ReferenceResult Error(string errorMessage)
-            => new ReferenceResult(false, null, errorMessage);
+            => new(false, null, errorMessage);
 
         public bool IsSuccessful { get; }
 
@@ -450,10 +465,10 @@ public static class BibleReferenceParser
         }
 
         public static ReferenceBookResult Success(BibleBook book)
-            => new ReferenceBookResult(true, book, null);
+            => new(true, book, null);
 
         public static ReferenceBookResult Error(string errorMessage)
-            => new ReferenceBookResult(false, null, errorMessage);
+            => new(false, null, errorMessage);
 
         public bool IsSuccessful { get; }
 
@@ -472,10 +487,10 @@ public static class BibleReferenceParser
         }
 
         public static ReferenceSegmentResult Success(IList<ReferenceSegment> segments)
-            => new ReferenceSegmentResult(true, segments, null);
+            => new(true, segments, null);
 
         public static ReferenceSegmentResult Error(string errorMessage)
-            => new ReferenceSegmentResult(false, null, errorMessage);
+            => new(false, null, errorMessage);
 
         public bool IsSuccessful { get; }
 
@@ -495,10 +510,10 @@ public static class BibleReferenceParser
         }
 
         public static ReferencePointResult Success(ReferencePoint point, int? chapterOverride)
-            => new ReferencePointResult(true, point, chapterOverride, null);
+            => new(true, point, chapterOverride, null);
 
         public static ReferencePointResult Error(string errorMessage)
-            => new ReferencePointResult(false, null, null, errorMessage);
+            => new(false, null, null, errorMessage);
 
         public bool IsSuccessful { get; }
 
