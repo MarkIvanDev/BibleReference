@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <PackageId>BibleReference$(suffix)</PackageId>
-    <PackageVersion>2.0.0-dev.8</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Title>BibleReference</Title>
     <Authors>markivan.basto</Authors>
     <Description>A library to parse text into bible references in multiple locales.</Description>
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BibleBooks$(suffix)" Version="2.0.0-dev.7" />
+    <PackageReference Include="BibleBooks$(suffix)" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
